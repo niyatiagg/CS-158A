@@ -1,9 +1,19 @@
 from socket import *
+
 # Defining the port number the server will listen on
 serverPort = 12000
 
 # Defining the buffer size
 bufferSize = 64
+
+def receive_data():
+    data_recvd = b""
+    while len(data_recvd) < msgLen:
+        packet = cnSocket.recv(min(bufferSize, msgLen - len(data_recvd)))
+        if not packet:
+            break
+        data_recvd += packet
+    return data_recvd
 
 # Creating a TCP socket (AF_INET for IPv4, SOCK_STREAM for TCP)
 serverSocket = socket(AF_INET, SOCK_STREAM)
@@ -32,13 +42,7 @@ while True:
     print("msg_len:", msgLen)
 
     # Receive the rest of the message based on msg_len
-    data = b""
-    while len(data) < msgLen:
-        packet = cnSocket.recv(min(bufferSize, msgLen - len(data)))
-        if not packet:
-            break
-        data += packet
-
+    data = receive_data()
     sentence = data.decode()
 
     # Printing relevant information from the message like decoded string and actual message length
