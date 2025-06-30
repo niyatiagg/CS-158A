@@ -54,7 +54,7 @@ From Server: MY NAME IS NIYATI AGGARWAL. I AM A STUDENT AT SJSU ENROLLED IN MAST
 ## Screenshots
 
 ### Server Screenshot
-![ServerScreenshot.png](../resources/ServerScreenshot.png)
+![ServerScreenshot.png](../resources/Server_Assignment-1.png)
 
 ### Client Screenshot
-![ClientScreenshot.png](../resources/ClientScreenshot.png)
+![ClientScreenshot.png](../resources/Client_Assignment-1.png)

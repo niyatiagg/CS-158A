@@ -1,60 +1,101 @@
 ## Overview
-This simple program demonstrates the interaction of basic client and server using TCP connection
+This simple program demonstrates a chat server that allows multiple clients to join and exchange messages over a TCP connection.
 
 ## Setup
 ### Start the server
 
 ```commandline
-python myvlserver.py
+python mychatserver.py
 ```
-The server starts and waits for a connection from the client. It waits until client sends message, and keeps running after processing message from a client. The server needs to be manually terminated.
+The server initializes and begins listening for incoming connections from multiple clients. It continuously runs until manually terminated. Upon accepting a client connection, the server adds the client to a list of active connections. It then waits to receive messages from the connected clients and, upon receiving a message, relays it to all other active clients—excluding the original sender.
 
 ### Start the client
 
 ```commandline
-python myvlclient.py
+python mychatclient.py
 ```
-The client takes any string with length from (1-99) characters as input with string length as first 2 characters and sends it to the server. It prints the response received from server which is just the capitalized form of the input message string.
+Each client in the system can both send messages to the server and receive messages from other connected clients. The server is capable of handling any number of clients, and this can be adjusted by changing the maximum number of connections it listens for. In my implementation, I demonstrate the functionality using three clients. Each client is launched manually in a separate terminal window to simulate independent users participating in the chat.
 
 ## Examples
 
 ### Example 1 (message string smaller than buffer length)
 _Server Output_
 ```
-Connected from : ('127.0.0.1', 62120)
-msg_len: 10
-processed: helloworld
-msg_len_sent: 10
+Server listening on 127.0.0.1:12000
+New connection from : ('127.0.0.1', 54358)
+New connection from : ('127.0.0.1', 54383)
+New connection from : ('127.0.0.1', 54396)
+54358:Hi!
+54383:Hello! 
+54396:How are you guys doing?
+54383:Good.
+54358:Good.
 Connection closed
-```
-
-_Client Output_
-```
-Enter a lowercase sentence: 10helloworld   
-From server: HELLOWORLD
-```
-
-
-### Example 2 (message string larger than buffer length)
-_Server Output_
-```
-Connected from : ('127.0.0.1', 62653)
-msg_len: 99
-processed: my name is niyati aggarwal. i am a student at sjsu enrolled in masters program for computer science
-msg_len_sent: 99
 Connection closed
+Connection closed
+
 ```
 
-_Client Output_
+_Client1 Output_
 ```
-Input lowercase sentence:99my name is niyati aggarwal. i am a student at sjsu enrolled in masters program for computer science
-From Server: MY NAME IS NIYATI AGGARWAL. I AM A STUDENT AT SJSU ENROLLED IN MASTERS PROGRAM FOR COMPUTER SCIENCE
+Connected to chat server. Type 'exit' to leave.
+Hi!
+
+54383:Hello! 
+
+54396:How are you guys doing?
+
+54383:Good.
+Good.
+exit
+Disconnected from server
+
+```
+
+_Client2 Output_
+```
+Connected to chat server. Type 'exit' to leave.
+
+54358:Hi!
+Hello! 
+
+54396:How are you guys doing?
+Good.
+
+54358:Good.
+exit
+Disconnected from server
+
+```
+
+_Client3 Output_
+```
+Connected to chat server. Type 'exit' to leave.
+
+54358:Hi!
+
+54383:Hello! 
+How are you guys doing?
+
+
+54383:Good.
+
+54358:Good.
+exit
+Disconnected from server
+
 ```
 
 ## Screenshots
 
 ### Server Screenshot
-![ServerScreenshot.png](../resources/ServerScreenshot.png)
+![Server_Assignment-2.png](../resources/Server_Assignment-2.png)
 
-### Client Screenshot
-![ClientScreenshot.png](../resources/ClientScreenshot.png)
+### Client1 Screenshot
+![Client1_Assignment-2.png](../resources/Client1_Assignment-2.png)
+
+### Client2 Screenshot
+![Client2_Assignment-2.png](../resources/Client2_Assignment-2.png)
+
+### Client3 Screenshot
+![Client3_Assignment-2.png](../resources/Client3_Assignment-2.png)
