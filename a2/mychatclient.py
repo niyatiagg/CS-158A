@@ -42,7 +42,6 @@ receiving_thread = threading.Thread(target=receiving_messages, args=(clientSocke
 receiving_thread.start()
 
 sending_thread.join()
-# Why do we not need join for receiving thread
 
 clientSocket.close()
 #receiving_thread.join()
