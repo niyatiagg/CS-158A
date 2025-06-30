@@ -18,7 +18,7 @@ Each client in the system can both send messages to the server and receive messa
 
 ## Examples
 
-### Example 1 (message string smaller than buffer length)
+### Example 1
 _Server Output_
 ```
 Server listening on 127.0.0.1:12000

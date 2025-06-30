@@ -21,7 +21,7 @@ def worker_bee(port_num, conn_socket):
             conn_socket.send("exit".encode())
             conn_socket.close()
             clients.pop(port_num)
-            print("Connection closed")
+            print(f"Connection at port:{port_num} closed")
             break
 
         # Printing the message with their port number
