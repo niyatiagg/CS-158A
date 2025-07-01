@@ -11,16 +11,21 @@ bufferSize = 1024
 # connection socket
 clients = {}
 
+# Create a lock for concurrent access control of the client list
+cl_lock = threading.Lock()
+
 # Function that handles messages from clients
 def worker_bee(port_num, conn_socket):
     # Starting a sending thread for sending messages
     while True:
+        global clients
         data = conn_socket.recv(bufferSize)
         message = data.decode()
         if message == 'exit':
             conn_socket.send("exit".encode())
             conn_socket.close()
-            clients.pop(port_num)
+            with cl_lock:
+                clients.pop(port_num)
             print(f"Connection at port:{port_num} closed")
             break
 
