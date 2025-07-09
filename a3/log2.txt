@@ -1,0 +1,6 @@
+Received: bdb8f2f3-e8e3-45dd-9bb9-2e1e5f79a70c, flag=0, less, 0
+Sent: d51e4824-f1d9-4347-9ebd-d805eea17c5a, flag=0
+Received: d51e4824-f1d9-4347-9ebd-d805eea17c5a, flag=0, same, 0
+Leader is decided to d51e4824-f1d9-4347-9ebd-d805eea17c5a
+Sent: d51e4824-f1d9-4347-9ebd-d805eea17c5a, flag=1
+Received: d51e4824-f1d9-4347-9ebd-d805eea17c5a, flag=1, same, 1

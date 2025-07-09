@@ -10,34 +10,34 @@ my_id = uuid.uuid4()
 highest_id = my_id
 flag = 0
 
+def compare(a,b):
+    if a > b:
+        return 'greater'
+    elif b > a:
+        return 'less'
+    return 'same'
+
 def receive_msg(received_msg):
     global flag, highest_id, my_id
-    if flag == 1: # TODO: Is this to be added? is this correct
-        #with open(log_file, 'a') as file:
-        #  file.write("Should only be received by LEADER ONCE!!\n")
+    with open(log_file, 'a') as file:
+        file.write(f"Received: {received_msg.uuid}, flag={received_msg.flag}, {compare(received_msg.uuid, my_id)}, {flag}\n")
+
+    if flag == 1 and my_id == highest_id:
         print(f"I am the Leader with id: {highest_id}")
     else:
-        if received_msg.flag == 0:
-            if received_msg.uuid > highest_id:
-                highest_id = received_msg.uuid
-                with open(log_file, 'a') as file:
-                    file.write(f"Received: {received_msg.uuid}, flag={received_msg.flag}, greater, {flag}\n")
-                    send_msg(received_msg)
-            elif received_msg.uuid < highest_id:
-                with open(log_file, 'a') as file:
-                    file.write(f"Received: {received_msg.uuid}, flag={received_msg.flag}, less, {flag}\n") # No msg is sent
-            else:
-                flag = 1
-                with open(log_file, 'a') as file:
-                    file.write(f"Received: {highest_id}, flag={received_msg.flag}, same, {flag}\n")
-                    file.write(f"Leader is decided to {highest_id}, flag={received_msg.flag}, greater, {flag} \n")
-                send_msg(Message(highest_id, flag))
-        else:
-            flag = 1
+        if received_msg.flag == 0 and received_msg.uuid == highest_id:
             with open(log_file, 'a') as file:
-                file.write(f"Received: {highest_id}, flag={received_msg.flag}, same, {flag}\n")
+                file.write(f"Leader is decided to {highest_id}\n")
+            flag = 1
+            send_msg(Message(highest_id, flag))
+        elif received_msg.flag == 0 and received_msg.uuid > highest_id:
+            highest_id = received_msg.uuid
+            send_msg(received_msg)
+        elif received_msg.flag == 1:
+            with open(log_file, 'a') as file:
                 file.write(f"Leader is decided to {highest_id}\n")
             print(f"Leader is {highest_id}")
+            flag = 1
             send_msg(Message(highest_id, flag))
 
 
@@ -59,9 +59,9 @@ def le_server(saddress, sport):
     server_socket = socket(AF_INET, SOCK_STREAM)
     server_socket.bind((saddress, sport))
     server_socket.listen(2)
+    conn_socket, addr = server_socket.accept()
 
     while True:
-        conn_socket, addr = server_socket.accept()
         buff = ""
         while not buff.endswith('\n'):
             buff += conn_socket.recv(buffer_size).decode()
