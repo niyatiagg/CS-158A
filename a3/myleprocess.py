@@ -5,7 +5,7 @@ import uuid
 from message import Message
 import time
 
-# Maintaining global state of the node
+# Maintaining state of the node globally
 client_socket = socket(AF_INET, SOCK_STREAM)
 my_id = uuid.uuid4()
 highest_id = my_id
@@ -25,7 +25,7 @@ def receive_msg(received_msg):
     with open(log_file, 'a') as file:
         file.write(f"Received: {received_msg.uuid}, flag={received_msg.flag}, {compare(received_msg.uuid, my_id)}, {flag}\n")
 
-    # This is the final state of the leader
+    # This is the terminating state of the leader. There is no communication after this message is printed
     if flag == 1 and my_id == highest_id:
         print(f"I am the Leader with id: {highest_id}")
     else:
