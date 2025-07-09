@@ -4,7 +4,15 @@ This program implements a distributed leader election algorithm in an asynchrono
 ### Start the process
 
 ```commandline
-python myleprocess.py
+python myleprocess.py 1
+```
+
+```commandline
+python myleprocess.py 2
+```
+
+```commandline
+python myleprocess.py 3
 ```
 The process is run on three different terminals to simulate distinct nodes, each with a server and client running on separate threads. The server listens for incoming connections, while the client connects to the next node in the ring. Once connected, nodes exchange messages containing a UUID and a flag. Upon receiving a message, a node compares the incoming UUID with its own: it relays the message if the incoming UUID is greater, ignores it if it's lesser, and if the UUID matches its own, it identifies itself as the leader. It then sends a new message with _flag = 1_ to inform other nodes and prints the leader announcement to the console.
 
