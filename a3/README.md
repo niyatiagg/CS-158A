@@ -1,101 +1,50 @@
 ## Overview
-This simple program demonstrates a chat server that allows multiple clients to join and exchange messages over a TCP connection.
-
+This program implements a distributed leader election algorithm in an asynchronous ring network using sockets, where each node exchanges messages to determine a unique leader based on UUIDs. Here, server and client run on same node. 
 ## Setup
-### Start the server
+### Start the process
 
 ```commandline
-python mychatserver.py
+python myleprocess.py
 ```
-The server initializes and begins listening for incoming connections from multiple clients. It continuously runs until manually terminated. Upon accepting a client connection, the server adds the client to a list of active connections. It then waits to receive messages from the connected clients and, upon receiving a message, relays it to all other active clients—excluding the original sender.
-
-### Start the client
-
-```commandline
-python mychatclient.py
-```
-Each client in the system can both send messages to the server and receive messages from other connected clients. The server is capable of handling any number of clients, and this can be adjusted by changing the maximum number of connections it listens for. In my implementation, I demonstrate the functionality using three clients. Each client is launched manually in a separate terminal window to simulate independent users participating in the chat.
+The process is run on three different terminals to simulate distinct nodes, each with a server and client running on separate threads. The server listens for incoming connections, while the client connects to the next node in the ring. Once connected, nodes exchange messages containing a UUID and a flag. Upon receiving a message, a node compares the incoming UUID with its own: it relays the message if the incoming UUID is greater, ignores it if it's lesser, and if the UUID matches its own, it identifies itself as the leader. It then sends a new message with flag = 1 to inform other nodes and prints the leader announcement to the console.
 
 ## Examples
 
 ### Example 1
-_Server Output_
+_Process1 Output_
 ```
-Server listening on 127.0.0.1:12000
-New connection from : ('127.0.0.1', 54358)
-New connection from : ('127.0.0.1', 54383)
-New connection from : ('127.0.0.1', 54396)
-54358:Hi!
-54383:Hello! 
-54396:How are you guys doing?
-54383:Good.
-54358:Good.
-Connection closed
-Connection closed
-Connection closed
+Connection refused, retrying...
+Client connected:  ('localhost', 12002)
+Leader is d51e4824-f1d9-4347-9ebd-d805eea17c5a
 
 ```
 
-_Client1 Output_
+_Process2 Output_
 ```
-Connected to chat server. Type 'exit' to leave.
-Hi!
+Connection refused, retrying...
+Client connected:  ('localhost', 12003)
+I am the Leader with id: d51e4824-f1d9-4347-9ebd-d805eea17c5a
 
-54383:Hello! 
-
-54396:How are you guys doing?
-
-54383:Good.
-Good.
-exit
-Disconnected from server
 
 ```
 
-_Client2 Output_
+_Process3 Output_
 ```
-Connected to chat server. Type 'exit' to leave.
-
-54358:Hi!
-Hello! 
-
-54396:How are you guys doing?
-Good.
-
-54358:Good.
-exit
-Disconnected from server
+Client connected:  ('localhost', 12001)
+Leader is d51e4824-f1d9-4347-9ebd-d805eea17c5a
 
 ```
 
-_Client3 Output_
-```
-Connected to chat server. Type 'exit' to leave.
+## Log file Screenshots
 
-54358:Hi!
+### For Node1:
 
-54383:Hello! 
-How are you guys doing?
+![Screenshot 2025-07-08 at 11.55.00 PM.png](Screenshot%202025-07-08%20at%2011.55.00%E2%80%AFPM.png)
 
+### For Node2:
 
-54383:Good.
+![Screenshot 2025-07-08 at 11.56.05 PM.png](Screenshot%202025-07-08%20at%2011.56.05%E2%80%AFPM.png)
 
-54358:Good.
-exit
-Disconnected from server
+### For Node3:
 
-```
-
-## Screenshots
-
-### Server Screenshot
-![Server_Assignment-2.png](../resources/Server_Assignment-2.png)
-
-### Client1 Screenshot
-![Client1_Assignment-2.png](../resources/Client1_Assignment-2.png)
-
-### Client2 Screenshot
-![Client2_Assignment-2.png](../resources/Client2_Assignment-2.png)
-
-### Client3 Screenshot
-![Client3_Assignment-2.png](../resources/Client3_Assignment-2.png)
+![Screenshot 2025-07-08 at 11.56.48 PM.png](Screenshot%202025-07-08%20at%2011.56.48%E2%80%AFPM.png)
