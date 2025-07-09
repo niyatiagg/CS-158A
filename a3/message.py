@@ -13,7 +13,7 @@ class Message:
         return json.dumps({
             'uuid': str(self.uuid),
             'flag': self.flag
-        })
+        })+ '\n'
 
     @classmethod
     def from_json(cls, json_str : str):

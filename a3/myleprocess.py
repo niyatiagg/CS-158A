@@ -1,99 +1,98 @@
 import threading
+import sys
 from socket import *
 import uuid
 from a3.message import Message
 import time
 
-class Node:
-    highest_uuid = None
-    flag = 0
-    def __init__(self, my_id: uuid.UUID, server_sock: socket.socket, client_sock: socket.socket, log_file: str ,leader_id : uuid.UUID = None, flag: int = 0):
-        self.uuid = my_id
-        self.server_sock = server_sock
-        self.client_sock = client_sock
-        self.log_file = log_file
-        self.leader_id = leader_id
-        self.flag = flag
-        self.highest_uuid = my_id
+client_socket = None
+my_id = uuid.uuid4()
+highest_id = my_id
+flag = 0
 
-    def receive_msg(self,msg):
-        received_msg = Message.from_json(msg)
-        if self.flag == 1: # TODO: Is this to be added??
-            with open(self.log_file, 'a') as file:
-                file.write(f"Leader is decided to {self.leader_id}, flag=0, greater, 0 \n")
-                file.write(f"Received: {received_msg.uuid}, flag=0, greater, 0")
-            self.send_msg(Message(self.leader_id, self.flag))
-        else:
-            if received_msg.flag == 0:
-                if received_msg.uuid > self.uuid:
-                    with open(self.log_file, 'a') as file:
-                        file.write(f"Received: {received_msg.uuid}, flag=0, greater, 0")
-                        self.send_msg(msg)
-                elif received_msg.uuid < self.uuid:
-                    with open(self.log_file, 'a') as file:
-                        file.write(f"Received: {received_msg.uuid}, flag=0, less, 0") # No msg is sent
-                else:
-                    self.highest_uuid = self.uuid
-                    self.leader_id = self.uuid
-                    self.flag = 1
-                    with open(self.log_file, 'a') as file:
-                        file.write(f"Received: {received_msg.uuid}, flag=0, same, 0")
-                        file.write(f"Leader is decided to {self.leader_id}, flag=0, greater, 0 \n")
-                    self.send_msg(Message(self.leader_id, self.flag))
+def receive_msg(msg):
+    global flag, highest_id, my_id
+    received_msg = Message.from_json(msg)
+    if flag == 1: # TODO: Is this to be added? is this correct
+        with open(log_file, 'a') as file:
+            file.write(f"Received: {received_msg.uuid}, flag=0, greater, 0\n")
+    else:
+        if received_msg.flag == 0:
+            if received_msg.uuid > highest_id:
+                highest_id = received_msg.uuid
+                with open(log_file, 'a') as file:
+                    file.write(f"Received: {received_msg.uuid}, flag=0, greater, 0\n")
+                    send_msg(msg)
+            elif received_msg.uuid < highest_id:
+                with open(log_file, 'a') as file:
+                    file.write(f"Received: {received_msg.uuid}, flag=0, less, 0\n") # No msg is sent
             else:
-                self.leader_id = received_msg.uuid
-
-
-    def send_msg(self, msg) -> None:
-        if self.flag == 1:
-            self.client_sock.send(msg.encode())
-            with open(self.log_file, 'a') as file:
-                file.write(f"Sent: {self.leader_id}, flag=1")
+                flag = 1
+                with open(log_file, 'a') as file:
+                    file.write(f"Received: {highest_id}, flag=0, same, 0\n")
+                    file.write(f"Leader is decided to {highest_id}, flag=0, greater, 0 \n")
+                send_msg(Message(highest_id, flag))
         else:
-            self.client_sock.send(msg.encode())
-            with open(self.log_file, 'a') as file:
-                file.write(f"Sent: {msg.uuid}, flag=0")
+            flag = 1
+            with open(log_file, 'a') as file:
+                file.write(f"Received: {highest_id}, flag=0, same, 0\n")
+                file.write(f"Leader is decided to {highest_id}, flag=0, greater, 0 \n")
+            print(f"Leader is {highest_id}")
+            send_msg(Message(highest_id, flag))
 
-def le_server(node):
-    server_port = 12000
 
+def send_msg(msg):
+    global client_socket, flag, highest_id
+    while client_socket is None:
+        time.sleep(2)
+    client_socket.send(msg.encode())
+    with open(log_file, 'a') as file:
+        file.write(f"Sent: {highest_id}, flag={flag}")
+
+
+def le_server(server_tup):
     buffer_size = 1024
 
     server_socket = socket(AF_INET, SOCK_STREAM)
 
-    server_socket.bind(('localhost', server_port))
+    server_socket.bind(server_tup)
 
     server_socket.listen(2)
 
     while True:
         conn_socket, addr = server_socket.accept()
-        data = conn_socket.recv(buffer_size)
-        Node.receive_msg(data.decode())
+        buff = ""
+        while not buff.endswith('\n'):
+            buff += conn_socket.recv(buffer_size).decode()
+        msg = Message.from_json(buff.strip())
+        receive_msg(msg.decode())
 
-def le_client(node):
-    my_id = uuid.uuid4()
-    server_name = "localhost"
-    server_port = 12000
+def le_client(client_tup):
+    global client_socket
 
-    client_sock = socket(AF_INET, SOCK_STREAM)
+    client_socket = socket(AF_INET, SOCK_STREAM)
 
     while True:
         try:
-            client_sock.connect((server_name, server_port))
+            client_socket.connect(client_tup)
             break
-            # TODO: how to break out of this loop
         except OSError:
-            time.sleep(5)
+            time.sleep(10)
 
-    msg = Message(my_id, 0).to_json()
-    Node.send_msg(msg)
+    send_msg(Message(highest_id, flag).to_json())
 
 
 if __name__ == "__main__":
-    my_id = uuid.uuid4()
-    node = Node(my_id, )
-    server_th = threading.Thread(target=le_server())
-    client_th = threading.Thread(target=le_client())
+    file_suffix = ""
+    if len(sys.argv) == 2:
+        file_suffix = sys.argv[1]
+    config_file = "config" + file_suffix + ".txt"
+    log_file = "log" + file_suffix + ".txt"
+    with open(config_file, 'r') as f:
+        server_tuple = tuple(f.readline().strip().split(','))
+        client_tuple = tuple(f.readline().strip().split(','))
+    server_th = threading.Thread(target=le_server(), args=server_tuple)
+    client_th = threading.Thread(target=le_client(), args=client_tuple)
 
     server_th.start()
     client_th.start()
