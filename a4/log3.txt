@@ -1,6 +1,6 @@
-Sent: 10dec759-469e-4358-b814-617b629bad97, flag=0
-Received: d51e4824-f1d9-4347-9ebd-d805eea17c5a, flag=0, greater, 0
-Sent: d51e4824-f1d9-4347-9ebd-d805eea17c5a, flag=0
-Received: d51e4824-f1d9-4347-9ebd-d805eea17c5a, flag=1, greater, 0
-Leader is decided to d51e4824-f1d9-4347-9ebd-d805eea17c5a
-Sent: d51e4824-f1d9-4347-9ebd-d805eea17c5a, flag=1
+Sent: 2d1d74ef-a4f1-49a1-97ea-027133c73ee1, flag=0
+Received: d314ed16-78b8-4b96-9e33-3c2dfefd6045, flag=0, greater, 0
+Sent: d314ed16-78b8-4b96-9e33-3c2dfefd6045, flag=0
+Received: d314ed16-78b8-4b96-9e33-3c2dfefd6045, flag=1, greater, 0
+Leader is decided to d314ed16-78b8-4b96-9e33-3c2dfefd6045
+Sent: d314ed16-78b8-4b96-9e33-3c2dfefd6045, flag=1

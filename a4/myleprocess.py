@@ -42,6 +42,11 @@ def receive_msg(received_msg):
             send_msg(received_msg)
 
         # When sending node has a lower UUID
+        elif received_msg.flag == 0 and received_msg.uuid < highest_id:
+            with open(log_file, 'a') as file:
+                file.write(f"Ignored Message\n")
+
+        # When a message is received to inform the rest of the members of the ring of the elected leader
         elif received_msg.flag == 1:
             with open(log_file, 'a') as file:
                 file.write(f"Leader is decided to {highest_id}\n")
