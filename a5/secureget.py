@@ -5,7 +5,7 @@ def main():
     host_name = "www.google.com"
     port_number = 443
 
-    # Creating a plain TCP socket and connect
+    # Creating a plain TCP socket and connection
     c_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     c_sock.connect((host_name, port_number))
 
@@ -19,13 +19,11 @@ def main():
 
     # Receiving full HTTP response
     response = ''
-    #with open('response.html', 'a') as file:
     while True:
         data = ssl_sock.recv(1024)
         if not data:
             break
         response += data.decode()
-        #file.write(data.decode())
 
     # Closing the socket after receiving and saving all the data
     ssl_sock.close()
